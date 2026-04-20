@@ -1,0 +1,40 @@
+{
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": ".github/copilot-instructions.md"
+    }
+  ],
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "file": ".github/prompts/05-review-refactor.prompt.md"
+    }
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Tulis commit message dalam format: [fase] [type]: [deskripsi singkat dalam Bahasa Indonesia]. Fase: pre/hari-h/post/core/infra. Type: feat/fix/refactor/test/docs. Contoh: 'pre feat: tambah reminder DP vendor 7 hari sebelum jatuh tempo'"
+    }
+  ],
+  "github.copilot.chat.testGeneration.instructions": [
+    {
+      "text": "Gunakan Vitest. Describe block dalam Bahasa Indonesia. It block harus: 'harus [expected behavior] ketika [kondisi]'. Selalu sertakan: happy path, edge case (angka 0, string kosong), dan error case."
+    }
+  ],
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.preferences.importModuleSpecifier": "shortest",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "vue.server.hybridMode": true,
+  "files.associations": {
+    "*.prompt.md": "markdown"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  }
+}
