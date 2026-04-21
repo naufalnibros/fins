@@ -7,11 +7,16 @@ import { useCurrency } from '@/composables/useCurrency'
 import { useBudget } from '@/composables/useBudget'
 import PreBudgetCard from '@/components/pre/PreBudgetCard.vue'
 import VendorTracker from '@/components/pre/VendorTracker.vue'
+import VendorFormModal from '@/components/pre/VendorFormModal.vue'
+import VendorDPModal from '@/components/pre/VendorDPModal.vue'
+import EditCategoryBudgetModal from '@/components/pre/EditCategoryBudgetModal.vue'
 import ContributorManager from '@/components/pre/ContributorManager.vue'
 import SavingsGoalCard from '@/components/pre/SavingsGoalCard.vue'
 import RingTracker from '@/components/pre/RingTracker.vue'
 import ProgressBar from '@/components/common/ProgressBar.vue'
 import AppButton from '@/components/common/AppButton.vue'
+import type { Vendor } from '@/types/vendor.types'
+import type { BudgetCategory } from '@/types/budget.types'
 
 const budgetStore = useBudgetStore()
 const vendorStore = useVendorStore()
@@ -40,6 +45,49 @@ function handleSetup() {
 // Tab aktif
 type Tab = 'budget' | 'vendor' | 'contributor' | 'savings'
 const activeTab = ref<Tab>('budget')
+
+// --- Modal state ---
+const selectedVendor = ref<Vendor | null>(null)
+const selectedCategory = ref<BudgetCategory | null>(null)
+const isEditVendorOpen = ref(false)
+const isDPModalOpen = ref(false)
+const isEditCategoryOpen = ref(false)
+
+function openEditVendor(vendor: Vendor) {
+  selectedVendor.value = vendor
+  isEditVendorOpen.value = true
+}
+
+function openDPModal(vendorId: string) {
+  selectedVendor.value = vendors.value.find((v) => v.id === vendorId) ?? null
+  isDPModalOpen.value = true
+}
+
+function openEditCategory(categoryId: string) {
+  selectedCategory.value = categories.value.find((c) => c.id === categoryId) ?? null
+  isEditCategoryOpen.value = true
+}
+
+function handleVendorEditSubmit(data: import('@/types/vendor.types').VendorFormData) {
+  if (selectedVendor.value) {
+    vendorStore.updateVendor(selectedVendor.value.id, data)
+  }
+  isEditVendorOpen.value = false
+}
+
+function handleDPSubmit(payload: { amount: number; notes: string }) {
+  if (selectedVendor.value) {
+    vendorStore.recordDpPayment(selectedVendor.value.id, payload.amount, payload.notes)
+  }
+  isDPModalOpen.value = false
+}
+
+function handleCategoryBudgetSubmit(amount: number) {
+  if (selectedCategory.value) {
+    budgetStore.updateCategoryBudget(selectedCategory.value.id, amount)
+  }
+  isEditCategoryOpen.value = false
+}
 </script>
 
 <template>
@@ -144,6 +192,7 @@ const activeTab = ref<Tab>('budget')
           v-for="category in categories"
           :key="category.id"
           :category="category"
+          @edit-allocation="openEditCategory"
         />
       </div>
 
@@ -158,9 +207,9 @@ const activeTab = ref<Tab>('budget')
             v-for="vendor in vendors"
             :key="vendor.id"
             :vendor="vendor"
-            @edit="() => {}"
+            @edit="openEditVendor"
             @delete="vendorStore.deleteVendor"
-            @record-dp="() => {}"
+            @record-dp="openDPModal"
           />
         </div>
       </div>
@@ -175,4 +224,24 @@ const activeTab = ref<Tab>('budget')
       </div>
     </template>
   </div>
+
+  <!-- Modals -->
+  <VendorFormModal
+    v-if="isEditVendorOpen"
+    :vendor="selectedVendor"
+    @close="isEditVendorOpen = false"
+    @submit="handleVendorEditSubmit"
+  />
+  <VendorDPModal
+    v-if="isDPModalOpen"
+    :vendor="selectedVendor"
+    @close="isDPModalOpen = false"
+    @submit="handleDPSubmit"
+  />
+  <EditCategoryBudgetModal
+    v-if="isEditCategoryOpen"
+    :category="selectedCategory"
+    @close="isEditCategoryOpen = false"
+    @submit="handleCategoryBudgetSubmit"
+  />
 </template>

@@ -8,6 +8,10 @@ const props = defineProps<{
   category: BudgetCategory
 }>()
 
+const emit = defineEmits<{
+  'edit-allocation': [categoryId: string]
+}>()
+
 const { formatRupiah, formatShort } = useCurrency()
 
 const usagePercentage = computed(() =>
@@ -35,12 +39,23 @@ const remaining = computed(() => props.category.allocatedAmount - props.category
           <p class="text-xs text-gray-500">{{ category.percentage }}% dari total budget</p>
         </div>
       </div>
-      <span
-        class="text-xs font-semibold px-2 py-1 rounded-lg"
-        :style="{ background: category.color + '20', color: category.color }"
-      >
-        {{ usagePercentage }}%
-      </span>
+      <div class="flex items-center gap-1">
+        <span
+          class="text-xs font-semibold px-2 py-1 rounded-lg"
+          :style="{ background: category.color + '20', color: category.color }"
+        >
+          {{ usagePercentage }}%
+        </span>
+        <button
+          class="text-gray-400 hover:text-purple-600 transition-colors p-1 rounded"
+          title="Ubah alokasi"
+          @click="emit('edit-allocation', category.id)"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <ProgressBar
